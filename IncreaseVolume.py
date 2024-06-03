@@ -3,7 +3,7 @@
 """
 Created on Mon Jun  3 15:49:13 2024
 
-@author: Raphael Gondalier de Tugny
+@author: Raphael Gondallier de Tugny
 """
 
 from paraview.simple import *
