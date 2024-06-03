@@ -29,7 +29,8 @@ from paraview.simple import *
 # Outputs:
 # The script applies the correct scale factor to the aneurysm and prints the 
 # scale factor, the final volume of the aneurysm, the actual scale factor, 
-# and the error.===========================================================
+# and the error.
+# =============================================================================
 
 # Go to the last iteration of the displacement simulation
 animationScene1 = GetAnimationScene()
