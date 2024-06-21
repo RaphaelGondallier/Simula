@@ -3,7 +3,7 @@
 """
 Created on Wed Jun 19 17:36:19 2024
 
-@author: lisa
+@author: rdetugny
 """
 
 def relative_change(ref,change):
