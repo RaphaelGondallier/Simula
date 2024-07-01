@@ -14,7 +14,8 @@ from paraview.simple import *
 # applying the desired growth rate (V1-V0)/V0 with the dichotmy method.
 #
 # Prerequisites:
-# - Open the displacement.xdmf file and apply the clip filter with the desired 
+# - Open the displacement.xdmf file (make sure to have it downloaded on your computer,
+# otherwise, it might not work) and apply the clip filter with the desired 
 #   spatial division (e.g., a sphere encompassing the aneurysm).
 # - Create a WarpByVector filter, to which the CellSize is applied.
 # - Apply a PythonCalculator with the formula for computing the volume 
