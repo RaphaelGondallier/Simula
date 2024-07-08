@@ -25,7 +25,7 @@ import pandas as pd
 # =============================================================================
 # # Inputs
 # =============================================================================
-mesh_path = "/Users/lisa/Documents/Simula/AspectRatio/Case8/case8_el042_nocap.h5"
+mesh_path = "/path/to/mesh.h5"
 
 # Box parameters: (Position, Rotation, Length)
 pav_position = 0.0581051762278217, 0.12113347724177015, 0.07047083028173179 # Position of the corner
