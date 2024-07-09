@@ -5,6 +5,7 @@ pressure and centerline velocity in a pulsatile simulation. We then apply the re
 this deformation as an approximate "zero-pressure" geometry, using "predeform_mesh.py"
 """
 import numpy as np
+from math import cos, sin, radians
 from turtleFSI.problems import *
 from dolfin import HDF5File, Mesh, MeshFunction, assemble, UserExpression, FacetNormal, ds, \
     DirichletBC, Measure, inner, parameters, SpatialCoordinate, Constant, facets, sqrt
@@ -68,9 +69,9 @@ def set_problem_parameters(default_variables, **namespace):
             dx_s_id=2,  # ID of marker in the solid domain
 
             #FSI region: box defined by a corner, rotation angles and lengths
-            pav_position = 0.0581051762278217, 0.12113347724177015, 0.07047083028173179 # Position of the corner
-            pav_rotation = -38.357197876882466, -49.451991513570874, -21.137236896999312 # Rotation in degrees
-            pav_length =  0.001438159201877521, 0.0065222522667031605, 0.004527521944747901 # Length
+            box_position = [0.0581051762278217, 0.12113347724177015, 0.07047083028173179], # Position of the corner
+            box_rotation = [-38.357197876882466, -49.451991513570874, -21.137236896999312], # Rotation in degrees
+            box_length =  [0.001438159201877521, 0.0065222522667031605, 0.004527521944747901], # Length
 
 
             # mesh lifting parameters (see turtleFSI for options)
@@ -107,7 +108,7 @@ def transform_to_local(x, y, z, R, p):
     x_local, y_local, z_local = np.linalg.inv(R) @ np.array([x - p[0], y - p[1], z - p[2]])
     return x_local, y_local, z_local
 
-def get_mesh_domain_and_boundaries(mesh_path, pav_position, pav_rotation, pav_length, fsi_id, rigid_id, outer_wall_id, **namespace):
+def get_mesh_domain_and_boundaries(mesh_path, box_position, box_rotation, box_length, fsi_id, rigid_id, outer_wall_id, **namespace):
 
     # Read mesh
     mesh = Mesh()
@@ -119,15 +120,15 @@ def get_mesh_domain_and_boundaries(mesh_path, pav_position, pav_rotation, pav_le
     hdf.read(domains, "/domains")
 
     # Rotation matrix
-    R = rotation_matrix(*[radians(angle) for angle in pav_rotation])
+    R = rotation_matrix(*[radians(angle) for angle in box_rotation])
 
     # Make the points outside of the FSI region rigid
     for i, submesh_facet in enumerate(facets(mesh)):
         idx_facet = boundaries.array()[i]
         if idx_facet == fsi_id or idx_facet == outer_wall_id:
             mid = submesh_facet.midpoint()
-            x_local, y_local, z_local = transform_to_local(mid.x(), mid.y(), mid.z(), R, pav_position)
-            if not all(0 <= coord <= length for coord, length in zip([x_local, y_local, z_local], pav_length)):
+            x_local, y_local, z_local = transform_to_local(mid.x(), mid.y(), mid.z(), R, box_position)
+            if not all(0 <= coord <= length for coord, length in zip([x_local, y_local, z_local], box_length)):
                 boundaries.array()[i] = rigid_id  # Change ID from "fsi" to "rigid wall"
     return mesh, domains, boundaries
 
