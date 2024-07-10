@@ -27,7 +27,16 @@ def export_import_data(input_, csv_name):
 	points = data_array[:,1:4].tolist()
 	return points
 
+# =============================================================================
+# INPUTS
+# =============================================================================
 path = "/Users/lisa/Documents/Simula/AspectRatio/Case9"
+neck_slice_origin = [0.12312038894168996, 0.13432140154647867, 0.06351039414662109]
+neck_slice_normal = [0.261893954620752, -0.07346556709702588, -0.9622964028739877]
+aneurysm_clip_center = [0.12330716453601878, 0.13530589404617496, 0.06256396502637897]
+aneurysm_clip_radius = 0.004
+dome_clip_center = [0.1236790071159832, 0.13444514829080068, 0.0620668062720966] 
+dome_clip_radius = 0.0018298000000000006
 
 # find source
 case9_el047_nocap_boundaries000000vtu = FindSource('case9_el047_nocap_boundaries000000.vtu')
@@ -35,7 +44,6 @@ case9_el047_nocap_boundaries000000vtu = FindSource('case9_el047_nocap_boundaries
 # =============================================================================
 # AVERAGE DIAMETER
 # =============================================================================
-
 # create a new 'Threshold'
 threshold2 = Threshold(registrationName='Threshold2', Input=case9_el047_nocap_boundaries000000vtu)
 threshold2.LowerThreshold = 33.0
@@ -45,15 +53,15 @@ UpdatePipeline(time=0.0, proxy=threshold2)
 # Slice of the border only
 slice1 = Slice(registrationName='Slice1', Input=threshold2)
 slice1.SliceType = 'Plane'
-slice1.SliceType.Origin = [0.12312038894168996, 0.13432140154647867, 0.06351039414662109] #INPUT
-slice1.SliceType.Normal = [0.261893954620752, -0.07346556709702588, -0.9622964028739877] #INPUT
+slice1.SliceType.Origin = neck_slice_origin
+slice1.SliceType.Normal = neck_slice_normal
 UpdatePipeline(time=0.0, proxy=slice1)
 
 # Restricts the zone to the aneurysm
 clip3 = Clip(registrationName='Clip3', Input=slice1)
 clip3.ClipType = 'Sphere'
-clip3.ClipType.Center = [0.12330716453601878, 0.13530589404617496, 0.06256396502637897] # INPUT
-clip3.ClipType.Radius = 0.004 # INPUT
+clip3.ClipType.Center = aneurysm_clip_center
+clip3.ClipType.Radius = aneurysm_clip_radius
 UpdatePipeline(time=0.0, proxy=clip3)
 
 spreadSheetView1 = CreateView('SpreadSheetView')
@@ -71,12 +79,11 @@ print("Average neck diameter: ", avg_neck_diameter, " m")
 # =============================================================================
 # HEIGHT
 # =============================================================================
-
 # Slice of the whole mesh: threshold is not applied here
 slice2 = Slice(registrationName='Slice2', Input=case9_el047_nocap_boundaries000000vtu)
 slice2.SliceType = 'Plane'
-slice2.SliceType.Origin = [0.12312038894168996, 0.13432140154647867, 0.06351039414662109] #INPUT
-slice2.SliceType.Normal = [0.261893954620752, -0.07346556709702588, -0.9622964028739877] #INPUT
+slice2.SliceType.Origin = neck_slice_origin
+slice2.SliceType.Normal = neck_slice_normal
 UpdatePipeline(time=0.0, proxy=slice2)
 
 neck_points =  export_import_data(slice2, 'neck_points.csv')
@@ -84,8 +91,8 @@ neck_points =  export_import_data(slice2, 'neck_points.csv')
 # Defines dome
 clip_dome = Clip(registrationName='Clip_dome', Input=threshold2)
 clip_dome.ClipType = 'Sphere'
-clip_dome.ClipType.Center = [0.1236790071159832, 0.13444514829080068, 0.0620668062720966] # INPUT
-clip_dome.ClipType.Radius = 0.0018298000000000006 # INPUT
+clip_dome.ClipType.Center = dome_clip_center
+clip_dome.ClipType.Radius = dome_clip_radius
 UpdatePipeline(time=0.0, proxy=clip_dome)
 
 dome_points = export_import_data(clip_dome, 'dome_points.csv')
