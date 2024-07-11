@@ -30,22 +30,21 @@ def export_import_data(input_, csv_name):
 # =============================================================================
 # INPUTS
 # =============================================================================
-path = "/Users/lisa/Documents/Simula/AspectRatio/Case9"
-neck_slice_origin = [0.12312038894168996, 0.13432140154647867, 0.06351039414662109]
-neck_slice_normal = [0.261893954620752, -0.07346556709702588, -0.9622964028739877]
-aneurysm_clip_center = [0.12330716453601878, 0.13530589404617496, 0.06256396502637897]
-aneurysm_clip_radius = 0.004
-dome_clip_center = [0.1236790071159832, 0.13444514829080068, 0.0620668062720966] 
-dome_clip_radius = 0.0018298000000000006
-
+path = "/Users/lisa/Documents/Simula/AspectRatio/Case8"
+neck_slice_origin = [0.05910284542310764, 0.12623879522894743, 0.0693343226145506]
+neck_slice_normal = [-0.7957711341027185, -0.2338067476748584, -0.5586436313702846]
+aneurysm_clip_center = [0.05774242127364203, 0.12587777110051873, 0.06873685905599719]
+aneurysm_clip_radius = 0.003220599472964041
+dome_clip_center = [0.05625439625551745, 0.12550990139226945, 0.06765723462132578] 
+dome_clip_radius = 0.0027496650990392743
 # find source
-case9_el047_nocap_boundaries000000vtu = FindSource('case9_el047_nocap_boundaries000000.vtu')
+boundaries000000vtu= FindSource('case8_el042_nocap_boundaries000000.vtu')
 
 # =============================================================================
 # AVERAGE DIAMETER
 # =============================================================================
 # create a new 'Threshold'
-threshold2 = Threshold(registrationName='Threshold2', Input=case9_el047_nocap_boundaries000000vtu)
+threshold2 = Threshold(registrationName='Threshold2', Input=boundaries000000vtu)
 threshold2.LowerThreshold = 33.0
 threshold2.UpperThreshold = 33.0
 UpdatePipeline(time=0.0, proxy=threshold2)
@@ -79,14 +78,19 @@ print("Average neck diameter: ", avg_neck_diameter, " m")
 # =============================================================================
 # HEIGHT
 # =============================================================================
-# Slice of the whole mesh: threshold is not applied here
-slice2 = Slice(registrationName='Slice2', Input=case9_el047_nocap_boundaries000000vtu)
-slice2.SliceType = 'Plane'
-slice2.SliceType.Origin = neck_slice_origin
-slice2.SliceType.Normal = neck_slice_normal
-UpdatePipeline(time=0.0, proxy=slice2)
+# # To display the neck plane: Slice of the whole mesh: threshold is not applied here
+# slice2 = Slice(registrationName='Slice2', Input=boundaries000000vtu)
+# slice2.SliceType = 'Plane'
+# slice2.SliceType.Origin = neck_slice_origin
+# slice2.SliceType.Normal = neck_slice_normal
+# UpdatePipeline(time=0.0, proxy=slice2)
 
-neck_points =  export_import_data(slice2, 'neck_points.csv')
+# # Restricts the zone to the aneurysm
+# clip4 = Clip(registrationName='Clip4', Input=slice2)
+# clip4.ClipType = 'Sphere'
+# clip4.ClipType.Center = aneurysm_clip_center
+# clip4.ClipType.Radius = aneurysm_clip_radius
+# UpdatePipeline(time=0.0, proxy=clip4)
 
 # Defines dome
 clip_dome = Clip(registrationName='Clip_dome', Input=threshold2)
@@ -100,15 +104,15 @@ dome_points = export_import_data(clip_dome, 'dome_points.csv')
 distance_max = 0
 for i, dome_point in enumerate(dome_points):
 	xi, yi, zi = dome_point[0], dome_point[1], dome_point[2]
-	n_x, n_y, n_z = slice2.SliceType.Normal[0], slice2.SliceType.Normal[1], slice2.SliceType.Normal[2]
-	x0, y0, z0 = slice2.SliceType.Origin
+	n_x, n_y, n_z = slice1.SliceType.Normal[0], slice1.SliceType.Normal[1], slice1.SliceType.Normal[2]
+	x0, y0, z0 = slice1.SliceType.Origin
 	lambda_ = (n_x*(x0-xi) + n_y*(y0-yi) + n_z*(z0-zi)) / (n_x**2 + n_y**2 + n_z**2) # parameter of the parametric equation of a 
                                                                                      # line going through neck_point and perpendicular 
 																																																			# to the neck plane
 	intersection = [xi+n_x*lambda_, yi+n_y*lambda_, zi+n_z*lambda_] # intersection between the neck plane and the previous line
 	distance_ = distance(dome_point, intersection)
 
-# # plots lines
+# plots lines
 # 	line = Line(registrationName=f'Line{i}')
 # 	line.Point1 = dome_point
 # 	line.Point2 = intersection
@@ -130,5 +134,5 @@ for i, dome_point in enumerate(dome_points):
 # lineDisplay.AmbientColor = [0.8588235294117647, 0.0, 0.0]
 # lineDisplay.DiffuseColor = [0.8588235294117647, 0.0, 0.0]
 
-print(f"Height = {distance_max}")
+print(f"Height = {distance_max} m")
 print(f"Aspect ratio = {distance_max/avg_neck_diameter}")
