@@ -6,6 +6,14 @@ Created on Wed Jul 10 16:39:14 2024
 @author: Raphaël Gondallier de Tugny
 """
 
+# =============================================================================
+# Define here the required features to compute the aspect ratio of a specific case:
+# - the slice of the neck
+#       advice: apply a big scale factor to see how the neck is going to shrink and put the plane here
+# - the region of the aneurysm (so that the slice doesn't cut the rest of the artery)
+# - the dome of the aneurysm (from which the candidates points to compute the maximal height will be taken)
+# =============================================================================
+
 # trace generated using paraview version 5.12.0-RC2
 #import paraview
 #paraview.compatibility.major = 5
