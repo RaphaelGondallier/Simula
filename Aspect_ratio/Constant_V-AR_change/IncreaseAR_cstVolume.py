@@ -77,7 +77,7 @@ def set_AR(target_AR, warp_by_vector, ExtractSurface, slice1, clip1, clip_dome1,
 
     i = 0
     # Bisection search loop
-    while abs(AR_ - target_AR) > epsilon and i < 500: #/!\ target_AR is not the final target here but a AR_predform from the largest dichotomy
+    while abs(AR_ - target_AR) > epsilon and i < 50: #/!\ target_AR is not the final target here but a AR_predform from the largest dichotomy
         i += 1
         # Calculate the current ScaleFactor
         scale_factor = (low + high) / 2.0
@@ -124,7 +124,7 @@ def Increase_volume(V0, warp_by_vector, python_calculator):
     i = 0
     
     # Bisection search loop
-    while abs(vol - V0) > epsilon and i < 500:
+    while abs(vol - V0) > epsilon and i < 50:
         i += 1
         # Calculate the current ScaleFactor
         scale_factor = (low + high) / 2.0
@@ -178,15 +178,15 @@ python_calculator2 = FindSource("PythonCalculator2")
 warp_by_vector1.ScaleFactor = 0
 warp_by_vector2.ScaleFactor = 0
 AR0 = aspect_ratio(slice1, clip1, clip_dome1, spreadSheetView1)
-target_scale = 0.22
+target_scale = 0.2
 target_AR = AR0 * target_scale + AR0
 print(f"AR0 and target AR: {AR0}, {target_AR}")
 epsilon = 1e-5 * target_AR
 j=0
 AR_final=AR0
-iter_max = 25
+iter_max = 30
 AR_inf = 0 
-AR_sup = 2.571
+AR_sup = 2
 V0 = get_volume(python_calculator1)
 print(f"Initial volume: {V0}")
 AR_Scale_factor = 0 # global variable
