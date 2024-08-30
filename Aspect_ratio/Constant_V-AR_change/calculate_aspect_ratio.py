@@ -26,7 +26,8 @@ def aspect_ratio():
     	ExportView(f'{path}/{csv_name}', view=spreadSheetView1, RealNumberNotation='Mixed', RealNumberPrecision=6)
     	data = pd.read_csv(rf"{path}/{csv_name}")
     	data_array = data.values
-    	points = data_array[:,5:8].tolist() #depending on the file you use, the position of the points in the array could change
+    	points = data_array[:,1:4].tolist() #depending on the file you use, the position of the points in the array could change
+                                         #usually [:,5:8] or [:,1:4]
     	return points
     
     # =============================================================================
@@ -47,7 +48,7 @@ def aspect_ratio():
     # =============================================================================
     
     slice1 = FindSource("Slice1")
-    clip3 = FindSource("Clip3")
+    clip3 = FindSource("Clip1")
     spreadSheetView1 = CreateView('SpreadSheetView')
     # Caculates centroid and average diameter
     border_neck_points = export_import_data(clip3, 'border_neck_points.csv')
@@ -74,7 +75,7 @@ def aspect_ratio():
     # clip4.ClipType.Radius = aneurysm_clip_radius
     # UpdatePipeline(time=0.0, proxy=clip4)
     
-    clip_dome = FindSource("Clip_dome")
+    clip_dome = FindSource("Clip_dome1")
     
     dome_points = export_import_data(clip_dome, 'dome_points.csv')
     
@@ -89,32 +90,32 @@ def aspect_ratio():
     	intersection = [xi+n_x*lambda_, yi+n_y*lambda_, zi+n_z*lambda_] # intersection between the neck plane and the previous line
     	distance_ = distance(dome_point, intersection)
     
-    # # plots lines
-    # 	line = Line(registrationName=f'Line{i}')
-    # 	line.Point1 = dome_point
-    # 	line.Point2 = intersection
-    # 	UpdatePipeline(time=0.0, proxy=line)
+    # plots lines
+    	line = Line(registrationName=f'Line{i}')
+    	line.Point1 = dome_point
+    	line.Point2 = intersection
+    	UpdatePipeline(time=0.0, proxy=line)
     
     	if distance_ > distance_max:
     		distance_max = distance_
     		intersection_max = intersection
     		dome_point_max = dome_point
             
-    # #plots maximal height
-    # line = Line(registrationName='LineMax')
-    # line.Point1 = dome_point_max
-    # line.Point2 = intersection_max
-    # UpdatePipeline(time=0.0, proxy=line)
-    # renderView1 = GetActiveViewOrCreate('RenderView')
-    # lineDisplay = GetDisplayProperties(line, view=renderView1)
-    # # change solid color
-    # lineDisplay.AmbientColor = [0.8588235294117647, 0.0, 0.0]
-    # lineDisplay.DiffuseColor = [0.8588235294117647, 0.0, 0.0]
+    #plots maximal height
+    line = Line(registrationName='LineMax')
+    line.Point1 = dome_point_max
+    line.Point2 = intersection_max
+    UpdatePipeline(time=0.0, proxy=line)
+    renderView1 = GetActiveViewOrCreate('RenderView')
+    lineDisplay = GetDisplayProperties(line, view=renderView1)
+    # change solid color
+    lineDisplay.AmbientColor = [0.8588235294117647, 0.0, 0.0]
+    lineDisplay.DiffuseColor = [0.8588235294117647, 0.0, 0.0]
 
-    # print("Centroid: ", centroid)
-    # print("Average neck diameter: ", avg_neck_diameter, " m")
-    # print(f"Height = {distance_max} m")
-    # print(f"Aspect ratio = {distance_max/avg_neck_diameter}")
+    print("Centroid: ", centroid)
+    print("Average neck diameter: ", avg_neck_diameter, " m")
+    print(f"Height = {distance_max} m")
+    print(f"Aspect ratio = {distance_max/avg_neck_diameter}")
 
     return distance_max/avg_neck_diameter
 
